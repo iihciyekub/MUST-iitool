@@ -1,2 +1,10 @@
 .ipynb_checkpoints
 .vscode
+__pycache__
+.vs
+.ipynb_checkpoints
+.idea
+dist
+*.ico
+reference
+build

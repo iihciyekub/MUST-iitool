@@ -7,23 +7,22 @@
 
 import os
 import re
-import string
 import inlp.convert.chinese as cv  # 简体转繁体库
 import refTextDict
 
 
 # 创建 bibPyItem 类
-class bibPyItem:
+class BIBPYITEM:
     # 用于参考文献作者排序的字典
     gDic = refTextDict.refDic
 
-    def __init__(self, bibitemStr, style="mustAPA"):
-        '''
+    def __init__(self, bibItemStr, style="mustAPA"):
+        """
         初始化
-        '''
+        """
         self.gDic = ""
         # 初始化时传入的字符转繁体
-        self.bibitemStr = cv.s2t(bibitemStr)
+        self.bibitemStr = cv.s2t(bibItemStr)
         # 表示 bib文件中每一个item 格式后的文本
         self.__bibTex = ""
         # 表示参考文献的序号
@@ -43,7 +42,7 @@ class bibPyItem:
         self.__to_bibDict()
         # 获取作者姓名序号
         self.__getbibIndex()
-        #　默认参考文献样式为　MUST　APA
+        # 默认参考文献样式为　MUST　APA
         if style == "mustAPA":
             self.__to_bibStyle_mustAPA()
         else:
@@ -58,31 +57,31 @@ class bibPyItem:
 
     @property
     def bibDict(self):
-        '''
+        """
         返回格式后的 bibPyItem 字典
-        '''
+        """
         return self.__bibDict
 
     @property
     def bibStyle_mustAPA(self):
-        '''
+        """
         获取已转换化mustAPA格式的参考文献文本
-        '''
+        """
         return self.__bibTex
 
     def __to_bibDict(self, P=1):
-        '''
+        """
         私有方法
         方法:对已按@分割后的 bib 文本内容进行解析 \n
         返回值:bibItem字典\n
         参数:P=1(表示简体转繁体)P=0(表示不转换)
-        '''
+        """
         bibitemStr = self.bibitemStr
         # 简体转繁体
         if P == 1:
             bibitemStr = cv.s2t(bibitemStr)
         for i in self.__bibDict.keys():
-            y = re.findall(i+".*?{(.*?)}", bibitemStr, re.I)
+            y = re.findall(i + ".*?{(.*?)}", bibitemStr, re.I)
             self.__bibDict[i] = ("" if y == [] else y[0])
 
         # 提取 bibitem中的 引用标签字符串
@@ -99,32 +98,32 @@ class bibPyItem:
             self.__bibDict["lang"] = ('chinese' if match else "")
 
     def __getbibIndex(self):
-        '''
+        """
         私有方法
         按作者姓排序的实现
-        '''
+        """
         if self.__bibDict["author"] == "":
             tag = self.__bibDict["title"][0].upper()
         else:
             tag = self.__bibDict["author"][0].upper()
-        if tag in bibPyItem.gDic.values():
-            self.__bibIndex = list(bibPyItem.gDic.keys())[
-                list(bibPyItem.gDic.values()).index(tag)]
+        if tag in BIBPYITEM.gDic.values():
+            self.__bibIndex = list(BIBPYITEM.gDic.keys())[
+                list(BIBPYITEM.gDic.values()).index(tag)]
 
     def __to_bibStyle_mustAPA(self):
-        '''
+        """
         私有方法
         返回MUST APA Style 的格式化 bbl 文本
-        '''
+        """
         if self.__bibDict['lang'] == 'chinese':
             self.__chParser()
         else:
             self.__enParser()
 
     def __enParser(self):
-        '''
+        """
         英文类 bibItem 解析器
-        '''
+        """
         self.__bibTex = ""
         # 對 pd 格式的數據進行處理
         authorlist = [si.strip().title()
@@ -132,7 +131,7 @@ class bibPyItem:
 
         # 出現在正文中的引用標籤作者名
         citeauthor = authorlist[0].split(",")[0] if authorlist[0].split(",")[
-            0] != "" else "Null"
+                                                        0] != "" else "Null"
         if len(authorlist) >= 3:
             citeauthor += " et al."
         elif len(authorlist) == 2:
@@ -154,7 +153,6 @@ class bibPyItem:
             refauthor += r", \& "
             refauthor += authorlist[-1]
 
-        #　----------------------------------------->>
         # type I  ------->>普通文章类
         if self.__bibDict["bibType"] in ["article", "misc", "manual"]:
             # 格式化文本
@@ -218,11 +216,11 @@ class bibPyItem:
             self.__bibTex += (date + r"]{")
             self.__bibTex += (self.__bibDict["citelabel"] + "}\n")
             if self.__bibDict["author"] == "":
-                self.__bibTex += (self.__bibDict["title"]+",(")
+                self.__bibTex += (self.__bibDict["title"] + ",(")
                 self.__bibTex += (date + "), Retrieved from ")
                 self.__bibTex += self.__bibDict["url"]
             else:
-                self.__bibTex += (self.__bibDict["author"]+"(")
+                self.__bibTex += (self.__bibDict["author"] + "(")
                 self.__bibTex += (date + ")[" +
                                   self.__bibDict["description"] + "]." + self.__bibDict["title"])
                 self.__bibTex += (", Retrieved from " + self.__bibDict["url"])
@@ -320,9 +318,9 @@ class bibPyItem:
             self.__bibTex += ".\n\n"
 
     def __chParser(self):
-        ''''
+        """
         # 解析中文类 bib
-        '''
+        """
         self.__bibTex = ""
         if "and" in self.__bibDict["author"]:
             authorlist = [si.strip()
@@ -367,7 +365,7 @@ class bibPyItem:
             if self.__bibDict["journal"] != "":
                 self.__bibTex += "。\n"
                 self.__bibTex += r"\newblock \textbf{" + \
-                    self.__bibDict["journal"] + r"}"
+                                 self.__bibDict["journal"] + r"}"
             if self.__bibDict["number"] != "" or self.__bibDict["volume"] != "":
                 self.__bibTex += "，"
                 if self.__bibDict["volume"] != "":
@@ -383,7 +381,7 @@ class bibPyItem:
             self.__bibTex += "。"
             if self.__bibDict["doi"] != "":
                 self.__bibTex = self.__bibTex + \
-                    f" doi:{self.__bibDict['doi'] }"
+                                f" doi:{self.__bibDict['doi']}"
             self.__bibTex += "\n\n"
 
         # type ------->>畢業論文
@@ -409,7 +407,7 @@ class bibPyItem:
             self.__bibTex += "。\n\n"
 
         # type ------->>online
-        elif self.__bibDict["bibType"]in ["online"]:
+        elif self.__bibDict["bibType"] in ["online"]:
             if self.__bibDict["date"] != "":
                 date = self.__bibDict["date"].split("-")
                 if len(date) == 3:
@@ -425,11 +423,11 @@ class bibPyItem:
             self.__bibTex += (date + r"]{")
             self.__bibTex += (self.__bibDict["citelabel"] + "}\n")
             if self.__bibDict["author"] == "":
-                self.__bibTex += (self.__bibDict["title"]+"。(")
+                self.__bibTex += (self.__bibDict["title"] + "。(")
                 self.__bibTex += (date + ")。取自 ")
                 self.__bibTex += self.__bibDict["url"]
             else:
-                self.__bibTex += (self.__bibDict["author"]+"(")
+                self.__bibTex += (self.__bibDict["author"] + "(")
                 self.__bibTex += (date + ")【" +
                                   self.__bibDict["description"] + "】。" + self.__bibDict["title"])
                 self.__bibTex += ("。取自 " + self.__bibDict["url"])
@@ -512,10 +510,10 @@ class bibPyItem:
 
     @staticmethod
     def allbibFileToStr(bibfilePath):
-        '''
+        """
         方法:将所有 bib 文件的内容进行格式化并读取出来,返回文本
         bibfilePath: 包含 bib 文件的路径.str & list
-        '''
+        """
         bibFileStr = ""
         # 如果 bibfilePath 參數為 str 時,則處理為 list 類型
         if type(bibfilePath) == type(""):
@@ -525,7 +523,7 @@ class bibPyItem:
         for refF in bibfilePath:
             with open(refF, 'r', encoding="UTF-8") as f:
                 while 1:
-                        # 逐行读取
+                    # 逐行读取
                     a = f.readline()
                     # 去除空行
                     if a == '\n':
@@ -540,8 +538,8 @@ class bibPyItem:
                     # 处理最后一条数据包含逗号的情况
                     if temp == "}":
                         if bibFileStr[-2] == ",":
-                            bibFileStr = bibFileStr[:-2]+"\n"
-                    bibFileStr += (temp+"\n")
+                            bibFileStr = bibFileStr[:-2] + "\n"
+                    bibFileStr += (temp + "\n")
                     if not a:
                         break
             # 处理@字段与新行起写的问题
@@ -550,11 +548,11 @@ class bibPyItem:
         return bibFileStr
 
     @staticmethod
-    def findfile(path=r"", suffix="tex"):
-        '''
+    def findFile(path=r"", suffix="tex"):
+        """
         path: 值='/reference' 表示搜索目录下reference文件夹
         suffix:文件后缀名
-        '''
+        """
         dirs = f".{path}"
         # 判断目录是否存在
         if not os.path.exists(dirs):
@@ -567,9 +565,10 @@ class bibPyItem:
         rfile = ""
         for i in xfile:
             with open(i, "r", encoding="utf-8") as f:
-                flinetext = f.readlines()
-                if r"% LaTeX project" in flinetext:
+                flinetext = f.read()
+                if r"\documentclass" in flinetext:
                     rfile = i
-                else:
                     break
+                else:
+                    continue
         return rfile
