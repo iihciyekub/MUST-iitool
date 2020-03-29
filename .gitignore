@@ -4,7 +4,8 @@ __pycache__
 .vs
 .ipynb_checkpoints
 .idea
-dist
 *.ico
 reference
 build
+dist
+*.code-workspace

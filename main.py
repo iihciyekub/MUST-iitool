@@ -94,6 +94,9 @@ if __name__ == "__main__":
     outPutBBL = outPutBBL_H + tempC * t1 + ToutPutC * showZH + tempE * t1 + ToutPutE * showEN + outPutBBL_E
 
     # 保存 tex 文本到本地文件夹中
+    dirs = "{0}/format".format(os.getcwd())
+    if not os.path.exists(dirs):
+        os.makedirs(dirs)
     with open("format/ref.tex", "w", encoding="utf-8") as f:
         f.write(outPutBBL)
 

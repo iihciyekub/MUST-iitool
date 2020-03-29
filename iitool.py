@@ -137,21 +137,40 @@ class BIBPYITEM:
         elif len(authorlist) == 2:
             citeauthor += r" \& "
             citeauthor += authorlist[1].split(",")[0]
-
+        
+        # 定义一个方法用于处理英文名
+        def fun(name):
+            n = name.strip()
+            if "," in n:
+                n = n.replace(",", " ")
+                n = n.strip()
+            if " " in n:
+                a = [i for i in n.split(" ") if i != ""]
+                b = a[0] + ","
+                for ne in a[1:]:
+                    b += ne[0].upper() + '.'
+                n = b
+            return n
         # 出現在參考文獻中的作者信息
         refauthor = authorlist[0] if authorlist[0] != "" else "Null"
-        if len(authorlist) >= 2:
-            if len(authorlist) >= 8:
-                for j in authorlist[1:5]:
-                    refauthor += ", "
-                    refauthor += j
-                refauthor += ",..."
-            elif len(authorlist) >= 3:
+        # 取出第一位作者的信息
+        refauthor = fun(refauthor)
+        counts_author=len(authorlist)
+        if counts_author >= 7:
+            for j in authorlist[1:6]:
+                js = fun(j)
+                refauthor += ", "
+                refauthor += js.strip()
+            refauthor += ", et al"
+        elif counts_author >= 3 and counts_author <= 6:
+            if counts_author > 2:
                 for j in authorlist[1:-1]:
+                    js = fun(j)
                     refauthor += ", "
-                    refauthor += j
+                    refauthor += js
             refauthor += r", \& "
-            refauthor += authorlist[-1]
+            refauthor += fun(authorlist[-1])
+    
 
         # type I  ------->>普通文章类
         if self.__bibDict["bibType"] in ["article", "misc", "manual"]:
@@ -176,8 +195,8 @@ class BIBPYITEM:
                                       self.__bibDict["volume"] + r"}")
                 # 判斷是否存卷,卷號
                 if self.__bibDict["number"] != "":
-                    self.__bibTex += (r"{\em (" +
-                                      self.__bibDict['number'] + r")}")
+                    self.__bibTex += (r"(" +
+                                      self.__bibDict['number'] + r")")
             # 判斷是否存在頁碼
             if self.__bibDict["pages"] != "":
                 self.__bibTex += f", {self.__bibDict['pages']}"
@@ -337,20 +356,22 @@ class BIBPYITEM:
         elif len(authorlist) == 2:
             citeauthor += "與"
             citeauthor += authorlist[1]
-        # 出現在參考文獻中的作者信息
+        # ---- 出現在參考文獻中的作者信息
+        # 取出第一位作者的信息
         refauthor = authorlist[0]
-        if len(authorlist) >= 2:
-            if len(authorlist) >= 8:
-                for j in authorlist[1:6]:
-                    refauthor += "、"
-                    refauthor += j
-                refauthor += "、…"
-            elif len(authorlist) >= 3:
-                for j in authorlist[1:-1]:
-                    refauthor += "、"
-                    refauthor += j
-            refauthor += "與"
-            refauthor += authorlist[-1]
+        counts_author=len(authorlist)
+        if counts_author >= 7:
+            # 如果作者数量大于6位时
+            for j in authorlist[1:6]:
+                refauthor += "、"
+                refauthor += j.strip()
+            refauthor += "等人"
+        elif counts_author >= 2 and counts_author <= 6:
+        #     if counts_author > 2:
+            for j in authorlist:
+                refauthor += "、"
+                refauthor += j
+
 
         # type ------->>普通文章类
         if self.__bibDict["bibType"] in ["article", "misc", "manual"]:
